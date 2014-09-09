@@ -1,0 +1,165 @@
+1、中文无法传输问题修改
+
+修改：nl.justobjects.pushlet.core.XMLAdapter.java
+
+将
+private ServletOutputStream out = null;
+替换为
+private PrintWriter pw = null;
+
+并修改代码使用pw完成相应输出。
+
+
+2、修改nl.justobjects.pushlet.servlet.Pushlet.java
+
+//添加如下代码
+// 点播推送用户和连接信息（用户名，所有连接集合_Set防止重复）
+public static final Map<String, HashSet<String>> UNICAST_USERS = new HashMap<String, HashSet<String>>();
+
+/**
+ * Generic request handler (GET+POST).
+ */
+protected void doRequest(Event anEvent, HttpServletRequest request,
+			HttpServletResponse response) {
+	
+		//修改doRequest，添加如下代码
+		String unicastType = Config.getProperty("unicast.type");
+
+		// 获得pushlet的SessionID
+		String sessionId = anEvent.getField(P_ID);
+		if (sessionId != null) {
+			// 获得当前的用户名（提前存入了Session）
+			String userId = anEvent.getField("userId");
+			if (userId != null) {
+				// 用户多会话点播
+				// 为用户会话初始化会话集合列表
+				if (UNICAST_USERS.get(userId) == null) {
+					UNICAST_USERS.put(userId, new ArrayList<String>());
+				}
+				//登记会话，不存在会话，则添加
+				if(!UNICAST_USERS.get(userId).contains(sessionId)){
+					UNICAST_USERS.get(userId).add(sessionId);
+				}
+			}
+		}
+	
+			
+		//其他代码
+}
+
+
+3、修改nl.justobjects.pushlet.core.Dispatcher.java
+
+添加新方法：
+	/**
+	 * 为指定用户点播
+	 * 
+	 * @param event
+	 * @param userId
+	 */
+	public synchronized void unicastUserId(Event event, String userId) {
+		// 用户已连接
+		if (Pushlet.UNICAST_USERS.get(userId) != null) {
+			String unicastType = Config.getProperty("unicast.type");
+			//点播类型默认为all，所有连接
+			if(unicastType==null){
+				unicastType="all"; 
+			}
+			unicastUserId(event,userId,unicastType);
+		}
+	}
+	
+	/**
+	 * 为指定用户点播
+	 * 
+	 * @param event
+	 * @param userId
+	 * @param unicastType
+	 */
+	public synchronized void unicastUserId(Event event, String userId,
+			String unicastType) {
+		// 用户已连接
+		if (Pushlet.UNICAST_USERS.get(userId) != null) {
+
+			List<String> userSessions = Pushlet.UNICAST_USERS.get(userId);
+			// 已退出的用户
+			List<String> removeSessions = new ArrayList<String>();
+
+			if (unicastType.equalsIgnoreCase("first")
+					|| unicastType.equalsIgnoreCase("last")) {
+				if (userSessions.size() > 0) {
+					String sessionId = userSessions.get(0); // first
+					if (unicastType.equalsIgnoreCase("last")) {
+						sessionId = userSessions.get(userSessions.size() - 1); // last
+					}
+					if (SessionManager.getInstance().getSession(sessionId) != null) {
+						// 点播信息给用户的会话
+						unicast(event, sessionId);
+					} else {
+						// 记录断开连接的用户
+						removeSessions.add(sessionId);
+					}
+				}
+
+			} else {
+				// all
+				for (int i = 0; i < userSessions.size(); i++) {
+					String sessionId = userSessions.get(i);
+					// 用户会话有效（sessionID存在）
+					if (SessionManager.getInstance().getSession(sessionId) != null) {
+						// 点播信息给用户的会话
+						unicast(event, sessionId);
+					} else {
+						// 记录断开连接的用户
+						removeSessions.add(sessionId);
+					}
+				}
+			}
+			// 用户离线，移除绑定的用户会话记录
+			userSessions.removeAll(removeSessions);
+			// 如果用户都已离开，则移除
+			if (userSessions.size() == 0) {
+				Pushlet.UNICAST_USERS.remove(userId);
+			}
+		}
+	}
+	
+	
+4、修改nl.justobjects.pushlet.core.SessionManager.java
+
+
+	/**
+	 * Register session for removal.
+	 */
+	public Session removeSession(Session aSession) {
+		synchronized (mutex) {
+			Session session = (Session) sessions.remove(aSession.getId());
+			if (session != null) {
+				info(session.getId() + " at " + session.getAddress() + " removed ");
+			}
+			//添加代码
+			//已退出的用户
+			List<String> removeSessions = new ArrayList<String>();
+			for(Entry<String, ArrayList<String>> e:Pushlet.UNICAST_USERS.entrySet()){
+				if(e.getValue().contains(session.getId())){
+					e.getValue().remove(session.getId()); //从用户广播注册列表移除当前会话
+				}
+				if(e.getValue().size()==0){
+					removeSessions.add(e.getKey());
+				}
+			}
+			//清除无效userId(已无会话)
+			for(String userId:removeSessions){
+				Pushlet.UNICAST_USERS.remove(userId);
+			}
+			sessionCacheDirty = true;
+			return session;
+		}
+	}
+
+4、修改nl.justobjects.pushlet.util.Sys.java
+添加如下代码：
+
+	public static final String USERUNICAST_ALL="all";
+	public static final String USERUNICAST_FIRST="all";
+	public static final String USERUNICAST_LAST="all";

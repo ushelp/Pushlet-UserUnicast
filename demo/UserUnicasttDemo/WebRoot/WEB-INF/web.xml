@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+  <servlet>
+    <servlet-name>pushlet</servlet-name>
+    <servlet-class>
+         nl.justobjects.pushlet.servlet.Pushlet 
+       </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>pushlet</servlet-name>
+    <url-pattern>/pushlet.srv</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>MsgPushServlet</servlet-name>
+    <servlet-class>servlet.MsgPushServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MsgPushServlet</servlet-name>
+    <url-pattern>/servlet/MsgPushServlet</url-pattern>
+  </servlet-mapping>
+</web-app>
