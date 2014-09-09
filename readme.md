@@ -67,7 +67,7 @@ pushlet-UserUnicast 是一个基于pushlet修改扩展之后的`JAVA comet`实�
 
 ## pushlet-userunicast 用户推送使用步骤和示例：
 
-1. 为项目引入lib下的jar包
+1. 为项目引入lib下的jar包：
 **pushlet-userunicast.jar**
 **log4j.jar**
 
@@ -76,11 +76,11 @@ pushlet-UserUnicast 是一个基于pushlet修改扩展之后的`JAVA comet`实�
 **pushlet.properties**
 **sources.properties**
 
-2. 在需要订阅事件的 Web 项目中加入client下的客户端JS文件：
+3. 在需要订阅事件的 Web 项目中加入client下的客户端JS文件：
 **ajax-pushlet-client.js**
 
-3. 在 `web.xml` 配置 `pushlet` 核心Servlet控制器
-```XML
+4. 在 `web.xml` 配置 `pushlet` 核心Servlet控制器
+  ```XML
   <servlet>
         <servlet-name>pushlet</servlet-name>
         <servlet-class>
@@ -92,11 +92,11 @@ pushlet-UserUnicast 是一个基于pushlet修改扩展之后的`JAVA comet`实�
         <servlet-name>pushlet</servlet-name>
         <url-pattern>/pushlet.srv</url-pattern>
   </servlet-mapping>
-```
+  ```
 
 5. 客户端订阅接收消息 index.jsp
 使用`PL.userId`属性指定客户端的字符串标识，服务器端根据此标识推送数据到该客户端
- ```JS
+   ```JS
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
     <html>
     <head>
@@ -124,11 +124,11 @@ pushlet-UserUnicast 是一个基于pushlet修改扩展之后的`JAVA comet`实�
     	<a href="publish.jsp" target="_blank">后台推送消息页面</a>
     </body>
     </html>
-```
+  ```
 
 6. 服务器端推送数据的测试Servlet
 使用 `Dispatcher.getInstance().unicastUserId(Event, userId用户标识); ` 推送数据到指定用户标识的客户端，`userId用户标识` 对应  `PL.userId` 。
-```JAVA
+  ```JAVA
     package servlet;
 
     import java.io.IOException;
@@ -166,9 +166,9 @@ pushlet-UserUnicast 是一个基于pushlet修改扩展之后的`JAVA comet`实�
     	    Dispatcher.getInstance().unicastUserId(event, userId, type); 
     	}
     }
-```
+  ```
 web.xml的servlet配置
-```XML
+  ```XML
   <servlet>
         <servlet-name>MsgPushServlet</servlet-name>
         <servlet-class>servlet.MsgPushServlet</servlet-class>
@@ -178,10 +178,10 @@ web.xml的servlet配置
         <servlet-name>MsgPushServlet</servlet-name>
         <url-pattern>/servlet/MsgPushServlet</url-pattern>
   </servlet-mapping>
-```
+  ```
 
 7. 调用Servlet，发布推送消息的页面 publish.jsp
-```HTML
+  ```HTML
     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
     <html>
     <head>
@@ -212,7 +212,7 @@ web.xml的servlet配置
     	<iframe name="pushFrame" style="display: none;"></iframe>
     </body>
     </html>
-```
+  ```
 
 
 
