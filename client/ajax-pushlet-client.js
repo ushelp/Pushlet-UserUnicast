@@ -299,9 +299,10 @@ var PL = {
 			xmlhttp.onreadystatechange = function() {
 				if (xmlhttp.readyState == 4) {
 					if (xmlhttp.status == 200) {
+						
 						// Processing statements go here...
 						cb(xmlhttp.responseXML);
-
+			
 						// Avoid memory leaks in IE
 						// 12.may.2007 thanks to Julio Santa Cruz
 						xmlhttp = null;
@@ -409,9 +410,10 @@ var PL = {
 			if (PL.state < PL.STATE_LISTENING) {
 				PL._setStatus('not refreshing state=' + PL.STATE_LISTENING);
 			}
-			var timeout = event.get('p_wait');
+			var timeout = event.get('p_wait');	
 			setTimeout(function () {
 				PL._doRequest('refresh');
+				PL._doCallback(event, window.onConnected);
 			}, timeout);
 			return;
 		} else if (eventType == 'error') {
@@ -460,13 +462,14 @@ var PL = {
 
 /**  Handle XMLHttpRequest response XML. */
 	_onResponse: function(xml) {
+
 		PL.debug('_onResponse', xml);
 		var events = PL._rsp2Events(xml);
 		if (events == null) {
 			PL._setStatus('null events')
 			return;
 		}
-
+	
 		delete xml;
 
 		PL.debug('_onResponse eventCnt=', events.length);

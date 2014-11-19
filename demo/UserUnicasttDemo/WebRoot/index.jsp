@@ -29,10 +29,16 @@
 				.getElementById("msg").innerHTML
 				+ event.get("msg") + "<br/>";
 	}
+	window.onRefreshAck=function(){
+		document.getElementById("status").innerHTML="连接服务器成功！";
+	}
+
+	
 </script>
 </head>
 
 <body>
+	<h2 id="status">连接服务器中....</h2>
 	<div id="msg"></div>
 	<br />
 	<br />

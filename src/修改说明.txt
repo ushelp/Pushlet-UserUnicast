@@ -1,17 +1,24 @@
-1、中文无法传输问题修改
 
-修改：nl.justobjects.pushlet.core.XMLAdapter.java
+# JAVA 修改
+
+### 1、中文无法传输问题修改
+
+修改：`nl.justobjects.pushlet.core.XMLAdapter.java`
 
 将
+```JAVA
 private ServletOutputStream out = null;
+```
 替换为
+```JAVA
 private PrintWriter pw = null;
-
+```
 并修改代码使用pw完成相应输出。
 
 
-2、修改nl.justobjects.pushlet.servlet.Pushlet.java
+2、修改`nl.justobjects.pushlet.servlet.Pushlet.java`
 
+```JAVA
 //添加如下代码
 // 点播推送用户和连接信息（用户名，所有连接集合_Set防止重复）
 public static final Map<String, HashSet<String>> UNICAST_USERS = new HashMap<String, HashSet<String>>();
@@ -46,11 +53,12 @@ protected void doRequest(Event anEvent, HttpServletRequest request,
 			
 		//其他代码
 }
+```
 
-
-3、修改nl.justobjects.pushlet.core.Dispatcher.java
+3、修改`nl.justobjects.pushlet.core.Dispatcher.java`
 
 添加新方法：
+```JAVA
 	/**
 	 * 为指定用户点播
 	 * 
@@ -123,11 +131,11 @@ protected void doRequest(Event anEvent, HttpServletRequest request,
 			}
 		}
 	}
+```
 	
-	
-4、修改nl.justobjects.pushlet.core.SessionManager.java
+4、修改`nl.justobjects.pushlet.core.SessionManager.java`
 
-
+```JAVA
 	/**
 	 * Register session for removal.
 	 */
@@ -156,10 +164,46 @@ protected void doRequest(Event anEvent, HttpServletRequest request,
 			return session;
 		}
 	}
+```
 
-4、修改nl.justobjects.pushlet.util.Sys.java
+4、修改`nl.justobjects.pushlet.util.Sys.java`
 添加如下代码：
-
+```JAV
 	public static final String USERUNICAST_ALL="all";
 	public static final String USERUNICAST_FIRST="all";
 	public static final String USERUNICAST_LAST="all";
+```
+
+# JAVASCRIPT 修改：
+
+添加`userID`属性，在`_onEvent`函数的`refres`h判断中，注册服务器连接成功事件		`PL._doCallback(event, window.onConnected); ` 
+
+```JS
+var PL = {
+     //添加userID标识
+	userId:'',  
+    //....
+
+	_onEvent: function (event) {
+    	//...
+    	if (eventType == 'data') {
+    		//...
+    	} else if (eventType == 'refresh') {
+    		if (PL.state < PL.STATE_LISTENING) {
+    			PL._setStatus('not refreshing state=' + PL.STATE_LISTENING);
+    		}
+    		var timeout = event.get('p_wait');	
+    		setTimeout(function () {
+    			PL._doRequest('refresh');
+                //添加服务器连接成功事件  
+    			PL._doCallback(event, window.onConnected);  
+    		}, timeout);
+    		return;
+    	} else if (eventType == 'error') {
+    		//...
+    	}
+        //...
+    },
+    //...
+}
+```

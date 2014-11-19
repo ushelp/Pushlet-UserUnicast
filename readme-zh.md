@@ -13,13 +13,17 @@ pushlet-UserUnicast 是一个基于pushlet修改扩展之后的`JAVA comet`实�
 - 支持中文，使用 `Event` 进行`setField()`时无需转换字符编码
 - 简单易用
 
-**注意：**
+**说明：**
 
 - 阅读本文档、使用 pushlet-UserUnicast，需要掌握 pushlet 基础，了解 pushlet unicast 的不足 
 
 - 本文档仅包括：如何利用  pushlet-UserUnicast 实现对指定用户点播数据
  
 - 本文档不包括：pushlet的介绍、pushlet使用方法、pushlet的API。如需了解，请查阅其他文档。
+
+**注意：**
+
+- 由于推送机制和技术本身的限制，`first`和`last`推送并非是绝对精确的。这是因为：用户断开后，并不能立即检测到并从队列移除用户（有一定时间差），所以如果在某个用户断开连接后，立即进行`first`或`last`推送，可能会推送给已断开的用户。但在时间差允许范围内是安全的，而`all`方式推送时绝对安全的。
 
 ##  pushlet-userunicast API：
 
@@ -113,10 +117,16 @@ pushlet-UserUnicast 是一个基于pushlet修改扩展之后的`JAVA comet`实�
         				.getElementById("msg").innerHTML
         				+ event.get("msg") + "<br/>";
         	}
-        </script>
+    
+        	window.onConnected=function(){
+        		document.getElementById("status").innerHTML="连接服务器成功！";
+        	}
+
+         </script>
     </head>
     
     <body>
+        <h2 id="status" style="color: red">请等待，连接服务器中....</h2>
     	<div id="msg"></div>
     	<br />
     	<br />

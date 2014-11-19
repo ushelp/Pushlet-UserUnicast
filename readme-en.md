@@ -13,13 +13,17 @@ pushlet-UserUnicast is based on a modified extension `JAVA comet` pushlet after 
 - use `Event` be` setField () ` no need to convert the character encoding to support other character, 
 - Easy to use
 
-**Note:**
+**Explanation:**
 
 - Read this document, use pushlet-UserUnicast, need to master pushlet basis of lack of understanding pushlet unicast
 
 - This document includes only: How to use pushlet-UserUnicast achieve the specified user demand for data
  
 - This document does not include: Introduction pushlet's, pushlet use, pushlet the API. For more information, please consult other documentation.
+
+**Note:**
+
+- Due to restrictions push mechanism and the technology itself, `first` and` last` push is not absolutely accurate. This is because: After the user disconnects, and can not immediately detect and remove users from the queue (with a certain time lag), so if a user is disconnected immediately `first` or` last` push, might pushed to disconnected users. But in the time difference within the allowable range is safe, but `all` way when push absolutely safe.
 
 ##  pushlet-userunicast API: 
 
@@ -113,10 +117,16 @@ Use `PL.userId` attribute specifies the string that identifies the client, serve
         				.getElementById("msg").innerHTML
         				+ event.get("msg") + "<br/>";
         	}
-        </script>
+
+        	window.onConnected=function(){
+        		document.getElementById("status").innerHTML="Server Connected!";
+        	}
+
+         </script>
     </head>
     
     <body>
+        <h2 id="status" style="color: red">Please wait, Server Connecting....</h2>
     	<div id="msg"></div>
     	<br />
     	<br />
