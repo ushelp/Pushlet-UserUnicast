@@ -4,11 +4,12 @@
 
 基于pushlet的用户点播JAVA comet实现框架。
 
+- ### [中文](doc/readme-zh.md)
+
+
 JAVA COMET UserUnicast framework based on Pushlet. 
 
-- ### [中文](readme-zh.md)
-
-- ### [English](readme-en.md)
+- ### [English](doc/readme-en.md)
 
 
 ## 
@@ -19,3 +20,5 @@ JAVA COMET UserUnicast framework based on Pushlet.
 If you have more comments, suggestions or ideas, please contact me.
 
 Email：<inthinkcolor@gmail.com>
+
+[http://www.easyproject.cn](http://www.easyproject.cn "EasyProject Home")

@@ -235,3 +235,6 @@ If you have more comments, suggestions or ideas, please contact me.
 
 
 Contact, feedback, customization, training Email: <inthinkcolor@gmail.com>
+
+
+[http://www.easyproject.cn](http://www.easyproject.cn "EasyProject Home")
